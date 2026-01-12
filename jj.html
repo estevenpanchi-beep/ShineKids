@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Today - App Educativa</title>
+    <style>
+        /* =========================================
+           1. ESTILOS BASE Y GENERALES
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Rounded Mplus 1c', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            color: #333;
+            text-align: center;
+            padding-bottom: 50px;
+        }
+
+        /* Utilidad para ocultar/mostrar vistas */
+        .view-section {
+            display: none; /* Todas ocultas por defecto */
+            padding: 20px;
+            animation: slideUp 0.5s ease;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HEADER GLOBAL --- */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            text-align: left;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: white; border: 2px solid #edf2f7; padding: 10px 25px;
+            border-radius: 50px; font-weight: 700; color: #4a5568;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s; display: inline-flex; align-items: center; gap: 8px;
+            font-size: 16px; 
+        }
+        .back-btn:hover { transform: translateX(-5px); background: #f7fafc; }
+
+        /* =========================================
+           2. ESTILOS DEL MENÚ PRINCIPAL
+           ========================================= */
+        #menuView {
+            display: block; /* Visible al inicio */
+            padding-top: 40px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            position: relative;
+            height: 220px;
+            border: 4px solid white;
+        }
+
+        .menu-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.12); z-index: 10; }
+
+        .menu-card-bg {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s ease; filter: brightness(0.9);
+        }
+        
+        .menu-card:hover .menu-card-bg { transform: scale(1.1); filter: brightness(1); }
+
+        .menu-card-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0; top: 40%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;
+        }
+
+        .menu-card-title { color: white; font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-bottom: 5px; line-height: 1; }
+        
+        .menu-card-subtitle {
+            color: rgba(255,255,255,0.95); font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9;
+        }
+
+        /* Colores Específicos por Categoría */
+        .card-colors:hover { border-color: #63b3ed; }
+        .card-family:hover { border-color: #f687b3; }
+        .card-body:hover { border-color: #4fd1c5; }
+        .card-animals:hover { border-color: #f6ad55; }
+        .card-places:hover { border-color: #68d391; }
+        .card-food:hover { border-color: #e53e3e; }
+        .card-actions:hover { border-color: #805ad5; }
+
+        /* =========================================
+           ESTILOS COMUNES JUEGOS
+           ========================================= */
+        .game-header-bar {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .score-badge {
+            font-size: 24px; font-weight: 800; color: #4a5568; 
+            background: white; padding: 8px 25px; border-radius: 50px; 
+            border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .mix-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; padding: 15px 40px; border-radius: 50px;
+            font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(56, 161, 105, 0.3); transition: all 0.3s ease;
+            display: inline-flex; align-items: center; gap: 10px; margin-top: 20px;
+        }
+        .mix-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(56, 161, 105, 0.4); }
+
+        /* =========================================
+           3. JUEGO ANIMALS
+           ========================================= */
+        .animals-layout {
+            display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; align-items: start; text-align: left;
+        }
+        @media (max-width: 800px) { .animals-layout { grid-template-columns: 1fr; } }
+
+        .bank-section { background: rgba(255,255,255,0.8); padding: 25px; border-radius: 25px; border: 2px solid #e2e8f0; }
+        .bank-category { margin-bottom: 15px; }
+        .cat-header { font-size: 12px; text-transform: uppercase; font-weight: 800; color: #a0aec0; margin-bottom: 8px; letter-spacing: 1px; }
+        
+        .option-chip {
+            padding: 10px 15px; border: 2px solid; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
+            background: white; transition: all 0.2s; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .option-chip:hover { transform: translateY(-2px); filter: brightness(0.95); }
+        .chip-adj { border-color: #bee3f8; color: #2c5282; }
+        .chip-who { border-color: #fefcbf; color: #975a16; }
+        .chip-what { border-color: #c6f6d5; color: #276749; }
+        .chip-where { border-color: #e9d8fd; color: #553c9a; }
+
+        .slots-section {
+            background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center;
+        }
+        .slots-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        .slot-box {
+            height: 70px; border-radius: 15px; border: 3px dashed #cbd5e0; background: #f7fafc;
+            display: flex; align-items: center; padding: 0 20px; transition: all 0.3s ease;
+        }
+        .slot-box.filled { border-style: solid; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .slot-adj.filled { border-color: #63b3ed; background: #ebf8ff; }
+        .slot-who.filled { border-color: #f6ad55; background: #fffaf0; }
+        .slot-what.filled { border-color: #68d391; background: #f0fff4; }
+        .slot-where.filled { border-color: #9f7aea; background: #faf5ff; }
+
+        .result-box {
+            background: #2d3748; color: white; padding: 20px; border-radius: 15px; font-size: 20px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+        }
+        .result-box.active { background: #48bb78; transform: scale(1.02); box-shadow: 0 5px 20px rgba(72, 187, 120, 0.4); }
+        
+        /* =========================================
+           4. JUEGO COLORS
+           ========================================= */
+        .color-instruction-box {
+            background: white; padding: 30px; border-radius: 25px; margin: 0 auto 40px auto;
+            max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto; justify-items: center; }
+        .color-item {
+            width: 110px; height: 110px; border-radius: 50%; cursor: pointer; 
+            border: 6px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+            display: flex; align-items: center; justify-content: center; font-size: 45px; transition: transform 0.2s;
+        }
+        .color-item:hover { transform: scale(1.15) rotate(5deg); z-index: 5; }
+        .color-item.found { background-color: white !important; border-color: #48bb78; animation: popSuccess 0.4s ease forwards; cursor: default; }
+        .bg-red { background: #FC8181; } .bg-blue { background: #63B3ED; } 
+        .bg-yellow { background: #F6E05E; } .bg-green { background: #68D391; } .bg-purple { background: #B794F4; }
+
+        /* =========================================
+           5. JUEGO PLACES
+           ========================================= */
+        .clue-card {
+            background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            margin: 20px auto 50px auto; border-bottom: 8px solid #cbd5e0; max-width: 600px; animation: slideIn 0.5s;
+        }
+        .clue-icon { font-size: 80px; display: block; margin-bottom: 10px; }
+        .clue-text { font-size: 32px; font-weight: 800; color: #2d3748; }
+        
+        .places-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 25px; padding: 10px; }
+        .place-option {
+            background: white; border-radius: 25px; padding: 25px; cursor: pointer;
+            border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: all 0.2s;
+        }
+        .place-option:hover { transform: translateY(-5px); border-color: #e2e8f0; }
+        .place-option-emoji { font-size: 60px; display: block; margin-bottom: 10px; }
+        .place-option-name { font-size: 20px; font-weight: 800; color: #4a5568; }
+        .place-option.correct { background: #f0fff4; border-color: #48bb78; animation: bounceSuccess 0.5s; }
+        .place-option.wrong { border-color: #fc8181; animation: shake 0.4s; }
+
+        /* =========================================
+           6. JUEGO FAMILY
+           ========================================= */
+        #familyBoard { display: flex; justify-content: center; gap: 25px; margin: 40px 0; flex-wrap: wrap; min-height: 200px; }
+        .family-card {
+            width: 140px; height: 180px; background: white; border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; font-size: 20px; font-weight: 800;
+            color: #2d3748; animation: popIn 0.4s; border-bottom: 6px solid #f687b3;
+        }
+        .family-card .emoji { font-size: 70px; margin-bottom: 15px; }
+        .family-card.faded { opacity: 0.3; filter: grayscale(100%); }
+        .family-card.missing { border: 4px dashed #cbd5e0; background: #f7fafc; box-shadow: none; }
+
+        .family-option {
+            padding: 15px 30px; font-size: 22px; border-radius: 50px; border: 3px solid #f687b3;
+            cursor: pointer; font-weight: 800; background: white; transition: all 0.2s;
+            color: #d53f8c; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin: 10px;
+        }
+        .family-option:hover { transform: translateY(-3px); background: #fff5f7; }
+
+        /* =========================================
+           7. JUEGO FOOD
+           ========================================= */
+        .food-game-layout {
+            display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 25px; margin-bottom: 30px; text-align: left;
+        }
+        @media (max-width: 850px) { .food-game-layout { grid-template-columns: 1fr; text-align: center;} }
+
+        .column {
+            background: white; padding: 25px; border-radius: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-top: 6px solid;
+        }
+        .col-subject { border-color: #63b3ed; } .col-verb { border-color: #fc8181; } .col-food { border-color: #f6ad55; }
+        .column h3 { font-size: 20px; text-transform: uppercase; color: #a0aec0; margin-bottom: 20px; font-weight: 800; letter-spacing: 1px; }
+
+        .selection-card {
+            background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 18px; padding: 15px; margin-bottom: 15px;
+            cursor: pointer; transition: all 0.2s; font-size: 24px; font-weight: 700; color: #4a5568; display: flex; align-items: center; gap: 15px;
+        }
+        .selection-card:hover { transform: scale(1.02); background: white; }
+        .selection-card.selected { background: #ebf8ff; border-color: #4299e1; color: #2b6cb0; box-shadow: 0 5px 15px rgba(66, 153, 225, 0.2); }
+
+        .food-grid-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; }
+        .food-card {
+            background: white; border: 2px solid #e2e8f0; border-radius: 18px; padding: 10px; cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .food-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 12px; margin-bottom: 5px; }
+        .food-card.selected { border-color: #f6ad55; background: #fffaf0; transform: scale(1.05); box-shadow: 0 5px 15px rgba(237, 137, 54, 0.3); }
+
+        .food-check-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; padding: 15px 60px;
+            border-radius: 50px; font-size: 24px; font-weight: 900; cursor: pointer; box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+            transition: transform 0.2s;
+        }
+        .food-check-btn:hover { transform: translateY(-4px); }
+
+        /* =========================================
+           8. JUEGO BODY PARTS
+           ========================================= */
+        .body-instruction-area { margin-top: 20px; animation: float 3s ease-in-out infinite; }
+        .trainer-avatar {
+            font-size: 100px; background: #e6fffa; border: 6px solid #4fd1c5; border-radius: 50%;
+            width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto;
+            box-shadow: 0 15px 30px rgba(79, 209, 197, 0.2);
+        }
+        .instruction-bubble {
+            background: white; padding: 15px 40px; border-radius: 50px; border: 4px solid #4fd1c5; display: inline-block;
+        }
+        .instruction-bubble p { font-size: 32px; font-weight: 900; color: #2d3748; margin: 0; text-transform: uppercase; }
+
+        .body-cards-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+        .body-card {
+            width: 160px; height: 200px; background: white; border: 4px solid #e2e8f0; border-radius: 30px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.1s; box-shadow: 0 8px 0 #cbd5e0;
+        }
+        .body-card:active { transform: translateY(4px); box-shadow: 0 4px 0 #cbd5e0; }
+        .body-card-icon { font-size: 80px; margin-bottom: 10px; }
+        .body-card-text { font-size: 22px; font-weight: 800; color: #4a5568; }
+        
+        .body-card.correct { background: #f0fff4; border-color: #48bb78; box-shadow: 0 8px 0 #2f855a; animation: jump 0.5s; }
+        .body-card.wrong { background: #fff5f5; border-color: #fc8181; box-shadow: 0 8px 0 #c53030; animation: shake 0.4s; }
+
+        /* =========================================
+           9. JUEGO ACTIONS
+           ========================================= */
+        .action-instruction-box {
+            background: white; padding: 50px; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            margin: 30px auto; max-width: 600px; border-bottom: 10px solid #805ad5;
+        }
+        .action-emoji-display { font-size: 140px; margin-bottom: 20px; animation: bounceAction 1s infinite alternate; }
+        .action-text-display { font-size: 56px; font-weight: 900; color: #4a5568; text-transform: uppercase; }
+        
+        .action-timer-circle {
+            width: 120px; height: 120px; border-radius: 50%; border: 8px solid #805ad5;
+            display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: 800; color: #805ad5;
+            margin: 30px auto; background: white;
+        }
+
+        /* ANIMACIONES */
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes bounceSuccess { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes bounceAction { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Daily_Beetle_-_Kevin_MacLeod.ogg" type="audio/ogg">
+    </audio>
+
+    <div class="header">
+        <h1><span>🎓</span> Shine Kids</h1>
+    </div>
+
+    <div id="menuView" class="view-section">
+        <div class="menu-grid">
+            
+            <div class="menu-card card-colors" onclick="openColorsGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1502691876148-a84978e59af8?auto=format&fit=crop&w=800&q=80" alt="Colors">
+                <div class="menu-card-overlay"><div class="menu-card-title">Colors</div><div class="menu-card-subtitle">Color Hunt! 🎨</div></div>
+            </div>
+
+            <div class="menu-card card-family" onclick="openFamilyGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80" alt="Family">
+                <div class="menu-card-overlay"><div class="menu-card-title">Family</div><div class="menu-card-subtitle">Who is missing? 👨‍👩‍👧</div></div>
+            </div>
+
+            <div class="menu-card card-body" onclick="openBodyGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80" alt="Body">
+                <div class="menu-card-overlay"><div class="menu-card-title">Body Parts</div><div class="menu-card-subtitle">Move & Touch! 👋🦶</div></div>
+            </div>
+
+            <div class="menu-card card-animals" onclick="openAnimalsGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=800&q=80" alt="Zorro">
+                <div class="menu-card-overlay"><div class="menu-card-title">Animals</div><div class="menu-card-subtitle">Silly Sentences 🦊</div></div>
+            </div>
+
+            <div class="menu-card card-places" onclick="openPlacesGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=800&q=80" alt="Places">
+                <div class="menu-card-overlay"><div class="menu-card-title">Places</div><div class="menu-card-subtitle">Where does it belong? 📍</div></div>
+            </div>
+
+            <div class="menu-card card-food" onclick="openFoodGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=800&q=80" alt="Food">
+                <div class="menu-card-overlay"><div class="menu-card-title">Food & Drinks</div><div class="menu-card-subtitle">Yummy words 🍕🥤</div></div>
+            </div>
+
+            <div class="menu-card card-actions" onclick="openActionsGame()">
+                <img class="menu-card-bg" src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80" alt="Let's Move">
+                <div class="menu-card-overlay"><div class="menu-card-title">Let's Move!</div><div class="menu-card-subtitle">Action Game 🏃‍♂️</div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="animalsView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+            <h2 style="color:#4a5568;">🦁 Sentence Builder</h2>
+        </div>
+        <div class="animals-layout">
+            <div class="bank-section">
+                <div class="bank-title"><span>🗂️</span> Card Bank</div>
+                <div class="bank-category"><div class="cat-header txt-adj">1. Adjectives</div><div class="options-grid" id="list-adj"></div></div>
+                <div class="bank-category"><div class="cat-header txt-who">2. Who?</div><div class="options-grid" id="list-who"></div></div>
+                <div class="bank-category"><div class="cat-header txt-what">3. What?</div><div class="options-grid" id="list-what"></div></div>
+                <div class="bank-category"><div class="cat-header txt-where">4. Where?</div><div class="options-grid" id="list-where"></div></div>
+            </div>
+            <div class="slots-section">
+                <h2 style="color:#4a5568; margin-bottom:20px;">Build your Sentence!</h2>
+                <div class="slots-container">
+                    <div class="slot-box slot-adj" id="slot-adj"><span class="slot-tag">Adj</span><div class="slot-content">...</div></div>
+                    <div class="slot-box slot-who" id="slot-who"><span class="slot-tag">Who</span><div class="slot-content">...</div></div>
+                    <div class="slot-box slot-what" id="slot-what"><span class="slot-tag">What</span><div class="slot-content">...</div></div>
+                    <div class="slot-box slot-where" id="slot-where"><span class="slot-tag">Where</span><div class="slot-content">...</div></div>
+                </div>
+                <div class="result-box" id="fullSentenceDisplay" onclick="playFullSentence()">Select cards... <span class="voice-icon">🔊</span></div>
+                <div class="write-zone">
+                    <h3>✏️ Write your own sentences</h3>
+                    <textarea class="write-input" placeholder="Type here..."></textarea>
+                </div>
+                <button class="reset-btn" onclick="resetAnimalsGame()">🗑️ Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="colorsView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+            <div style="display: flex; align-items: center;">
+                <span id="levelDisplay" class="level-display">Level 1/5</span>
+                <div id="timerDisplay" class="timer-display">⏳ 10s</div>
+            </div>
+        </div>
+        <div class="color-instruction-box">
+            <p>Find something...</p>
+            <h1 id="targetColorText" style="color: #333;">RED 🔴</h1>
+        </div>
+        <div class="color-grid" id="colorBoard"></div>
+        <div class="action-area"><button class="mix-btn" onclick="startColorRound()"><span>🔄</span> Start</button></div>
+    </div>
+
+    <div id="placesView" class="view-section">
+        <div class="game-header-bar"><button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button></div>
+        <div class="clue-card" id="clueCard"><span class="clue-icon" id="clueIcon">❓</span><div class="clue-text" id="clueText">Loading...</div></div>
+        <div class="places-options-grid" id="placesOptionsBoard"></div>
+    </div>
+
+    <div id="familyView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+            <div id="familyTimerDisplay" class="timer-display">⏳ 7</div>
+        </div>
+        <div id="familyQuestion">Look carefully 👀</div>
+        <div id="familyBoard"></div>
+        <div id="familyOptions"></div>
+    </div>
+
+    <div id="foodView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+            <div class="score-badge">⭐ <span id="foodScore">0</span></div>
+        </div>
+        <div class="food-game-layout">
+            <div class="column col-subject">
+                <h3>Who? 👤</h3>
+                <div class="selection-card" onclick="selectFoodItem('subject', 'I', this)"><span>🙋</span> I</div>
+                <div class="selection-card" onclick="selectFoodItem('subject', 'He', this)"><span>👦</span> He</div>
+                <div class="selection-card" onclick="selectFoodItem('subject', 'She', this)"><span>👧</span> She</div>
+            </div>
+            <div class="column col-verb">
+                <h3>Action ❤️</h3>
+                <div class="selection-card" onclick="selectFoodItem('verb', 'like', this)"><span>👍</span> like</div>
+                <div class="selection-card" onclick="selectFoodItem('verb', 'likes', this)"><span>💖</span> likes</div>
+            </div>
+            <div class="column col-food">
+                <h3>Yummy! 🍔</h3>
+                <div class="food-grid-items" id="foodGrid"></div>
+            </div>
+        </div>
+        <button class="food-check-btn" onclick="checkFoodSentence()">CHECK ✅</button>
+    </div>
+
+    <div id="bodyView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+            <div class="score-badge">Score: <span id="bodyScore">0</span></div>
+        </div>
+        <div class="body-instruction-area">
+            <div class="trainer-avatar" id="trainerAvatar">🤖</div>
+            <div class="instruction-bubble"><p id="bodyInstructionText">Ready to move?</p></div>
+        </div>
+        <div class="body-timer-container"><div class="body-timer-bar" id="bodyTimerBar"></div></div>
+        <div class="body-cards-container" id="bodyBoard">
+            <button class="start-btn-large" onclick="startBodyRound()">▶️ START GAME</button>
+        </div>
+    </div>
+
+    <div id="actionsView" class="view-section">
+        <div class="game-header-bar">
+            <button class="back-btn" onclick="resetAllGameState()"><span>⬅️</span> Back to Menu</button>
+        </div>
+        <div class="action-instruction-box">
+            <div class="action-emoji-display" id="actionEmoji">🏃‍♂️</div>
+            <div class="action-text-display" id="actionText">Ready?</div>
+        </div>
+        <div class="action-timer-circle" id="actionTimerDisplay">5</div>
+        <div style="margin-top: 30px;">
+            <button class="start-btn-large" onclick="startActionRound()" id="startActionBtn">▶️ START!</button>
+        </div>
+    </div>
+
+    <script>
+        // VARIABLES GLOBALES
+        const bgMusic = document.getElementById("bgMusic");
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Timer Refs Globales
+        let timerInterval = null; // Colors
+        let bodyTimer = null; // Body Parts
+        let familyTimer = null; // Family
+        let observationTimerInterval = null; // Family
+        let actionTimerRef = null; // Actions (timeout)
+        let globalActionInterval = null; // Actions & Body Phase 2
+
+        /* --- CONTROL DE AUDIO --- */
+        function playMusic() {
+            bgMusic.volume = 0.4;
+            if (bgMusic.paused) {
+                bgMusic.currentTime = 0;
+                bgMusic.play().catch(e => console.log("Audio error:", e));
+            }
+        }
+
+        function stopMusic() {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function playGameSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'success') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'win') {
+                playGameSound('success'); setTimeout(() => playGameSound('success'), 200);
+            } else if (type === 'pop') {
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'whistle') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            }
+        }
+
+        /* --- NAVEGACIÓN Y RESETEO --- */
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+            document.getElementById(viewId).style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        function resetAllGameState() {
+            // 1. Parar audio
+            window.speechSynthesis.cancel();
+            stopMusic(); 
+            if (audioCtx && audioCtx.state !== 'closed') audioCtx.suspend();
+
+            // 2. Limpiar TODOS los temporizadores
+            clearInterval(timerInterval); 
+            clearTimeout(bodyTimer);      
+            clearTimeout(familyTimer);    
+            clearInterval(observationTimerInterval); 
+            clearTimeout(actionTimerRef); 
+            clearInterval(globalActionInterval); 
+            
+            // 3. Volver al menú
+            showView('menuView');
+
+            // 4. Reactivar audioCtx
+            setTimeout(() => { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }, 100);
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 1: ANIMALS
+           ----------------------------------------------------- */
+        const animalsData = {
+            adj: [ { text: "The happy", emoji: "😊" }, { text: "The crazy", emoji: "🤪" }, { text: "The giant", emoji: "🐘" }, { text: "The tiny", emoji: "🐜" }, { text: "The sleepy", emoji: "😴" } ],
+            who: [ { text: "Fox", emoji: "🦊" }, { text: "Pig", emoji: "🐷" }, { text: "Shark", emoji: "🦈" }, { text: "Cat", emoji: "🐱" }, { text: "Bear", emoji: "🐻" } ],
+            what: [ { text: "eats pizza", emoji: "🍕" }, { text: "dances tango", emoji: "💃" }, { text: "plays guitar", emoji: "🎸" }, { text: "reads books", emoji: "📖" }, { text: "cooks pasta", emoji: "🍝" } ],
+            where: [ { text: "in the forest", emoji: "🌲" }, { text: "on the moon", emoji: "🌙" }, { text: "under the bed", emoji: "🛏️" }, { text: "at school", emoji: "🏫" }, { text: "in the car", emoji: "🚗" } ]
+        };
+        let animalsSelection = { adj: null, who: null, what: null, where: null };
+        let animalsInitDone = false;
+
+        function openAnimalsGame() {
+            showView('animalsView');
+            if(!animalsInitDone) {
+                renderAnimalsList('adj', 'chip-adj'); renderAnimalsList('who', 'chip-who');
+                renderAnimalsList('what', 'chip-what'); renderAnimalsList('where', 'chip-where');
+                animalsInitDone = true;
+            }
+        }
+
+        function renderAnimalsList(type, cssClass) {
+            const container = document.getElementById(`list-${type}`);
+            animalsData[type].forEach(item => {
+                const chip = document.createElement('div');
+                chip.className = `option-chip ${cssClass}`;
+                chip.innerHTML = `<span>${item.emoji}</span> ${item.text}`;
+                chip.onclick = () => selectAnimalOption(type, item);
+                container.appendChild(chip);
+            });
+        }
+        function selectAnimalOption(type, item) {
+            speakText(item.text); 
+            animalsSelection[type] = item;
+            const slot = document.getElementById(`slot-${type}`);
+            slot.classList.add('filled');
+            slot.querySelector('.slot-content').innerHTML = `${item.text} ${item.emoji}`;
+            updateAnimalsSentence();
+        }
+        function updateAnimalsSentence() {
+            const display = document.getElementById('fullSentenceDisplay');
+            const p1 = animalsSelection.adj ? animalsSelection.adj.text : "___";
+            const p2 = animalsSelection.who ? animalsSelection.who.text : "___";
+            const p3 = animalsSelection.what ? animalsSelection.what.text : "___";
+            const p4 = animalsSelection.where ? animalsSelection.where.text : "___";
+            display.dataset.sentence = `${p1} ${p2} ${p3} ${p4}`;
+            display.firstChild.textContent = display.dataset.sentence + "."; 
+            if (animalsSelection.adj && animalsSelection.who && animalsSelection.what && animalsSelection.where) {
+                display.style.background = "#48bb78"; display.classList.add('active'); 
+            }
+        }
+        function playFullSentence() {
+            const display = document.getElementById('fullSentenceDisplay');
+            if (display.classList.contains('active')) speakText(display.dataset.sentence);
+        }
+        function resetAnimalsGame() {
+            animalsSelection = { adj: null, who: null, what: null, where: null };
+            ['adj', 'who', 'what', 'where'].forEach(type => {
+                const slot = document.getElementById(`slot-${type}`);
+                slot.classList.remove('filled');
+                slot.querySelector('.slot-content').innerText = "...";
+            });
+            const display = document.getElementById('fullSentenceDisplay');
+            display.firstChild.textContent = "Select cards to start...";
+            display.style.background = "#2d3748"; display.classList.remove('active');
+            document.querySelector('.write-input').value = "";
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 2: COLORS
+           ----------------------------------------------------- */
+        const colorData = [
+            { name: 'red', hex: '#FC8181', label: 'RED 🔴', class: 'bg-red' },
+            { name: 'blue', hex: '#63B3ED', label: 'BLUE 🔵', class: 'bg-blue' },
+            { name: 'yellow', hex: '#F6E05E', label: 'YELLOW ⭐️', class: 'bg-yellow' },
+            { name: 'green', hex: '#68D391', label: 'GREEN 🟢', class: 'bg-green' },
+            { name: 'purple', hex: '#B794F4', label: 'PURPLE 🟣', class: 'bg-purple' }
+        ];
+        let currentTargetColor = null, timeLeft = 10, itemsFound = 0, colorLevel = 1;
+        const maxColorLevels = 5;
+
+        function openColorsGame() { colorLevel = 1; showView('colorsView'); startColorRound(); }
+
+        function startColorRound() {
+            clearInterval(timerInterval); itemsFound = 0; timeLeft = 11 - colorLevel; 
+            updateTimerDisplay();
+            document.getElementById('levelDisplay').innerText = `Level ${colorLevel}/${maxColorLevels}`;
+            document.getElementById('colorBoard').classList.remove('game-disabled');
+
+            timerInterval = setInterval(() => {
+                timeLeft--; updateTimerDisplay();
+                if(timeLeft <= 0) endColorGame(false);
+            }, 1000);
+
+            const board = document.getElementById('colorBoard'); board.innerHTML = '';
+            const randomTargetIndex = Math.floor(Math.random() * colorData.length);
+            currentTargetColor = colorData[randomTargetIndex];
+            document.getElementById('targetColorText').innerText = currentTargetColor.label;
+            document.getElementById('targetColorText').style.color = currentTargetColor.hex;
+            
+            speakText("Find " + currentTargetColor.name);
+
+            let itemsArray = [];
+            for(let i=0; i<4; i++) itemsArray.push(currentTargetColor);
+            const distractors = colorData.filter(c => c.name !== currentTargetColor.name);
+            for(let i=0; i<8; i++) itemsArray.push(distractors[Math.floor(Math.random() * distractors.length)]);
+            itemsArray.sort(() => Math.random() - 0.5);
+            
+            itemsArray.forEach(colorObj => {
+                const item = document.createElement('div');
+                item.className = `color-item ${colorObj.class}`;
+                item.onclick = function() { handleColorClick(this, colorObj); };
+                board.appendChild(item);
+            });
+        }
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+            display.innerText = `⏳ ${timeLeft}s`;
+            display.style.color = timeLeft <= 3 ? "red" : "#333";
+        }
+        function handleColorClick(element, itemData) {
+            if(element.classList.contains('found')) return;
+            if (itemData.name === currentTargetColor.name) {
+                playGameSound('success'); element.classList.add('found');
+                element.classList.remove(itemData.class); element.innerText = '⭐';
+                itemsFound++;
+                if(itemsFound === 4) {
+                    clearInterval(timerInterval);
+                    if(colorLevel < maxColorLevels) {
+                        speakText("Great job! Next level.");
+                        document.getElementById('targetColorText').innerText = "NEXT LEVEL! 🚀";
+                        colorLevel++; setTimeout(startColorRound, 2000);
+                    } else endColorGame(true);
+                }
+            } else {
+                playGameSound('error'); element.classList.add('wrong');
+                setTimeout(() => element.classList.remove('wrong'), 400);
+            }
+        }
+        function endColorGame(won) {
+            clearInterval(timerInterval);
+            document.getElementById('colorBoard').classList.add('game-disabled');
+            const title = document.getElementById('targetColorText');
+            if(won) { playGameSound('win'); title.innerText = "YOU WON! 🎉"; title.style.color = "#48bb78"; speakText("Congratulations!"); }
+            else { playGameSound('error'); title.innerText = "TIME'S UP! ⏰"; title.style.color = "#e53e3e"; speakText("Time is up."); }
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 3: PLACES
+           ----------------------------------------------------- */
+        const placesDB = [
+            { id: 'school', name: 'School', emoji: '🏫', relatedEmoji: '🎒', clues: ['Teachers work here', 'You learn math here'] },
+            { id: 'hospital', name: 'Hospital', emoji: '🏥', relatedEmoji: '🩺', clues: ['Doctors work here', 'Nurses help you here'] },
+            { id: 'park', name: 'Park', emoji: '🌳', relatedEmoji: '🪁', clues: ['You play outside here', 'You can walk the dog here'] },
+            { id: 'home', name: 'Home', emoji: '🏠', relatedEmoji: '🛌', clues: ['You sleep here', 'Your family lives here'] },
+            { id: 'store', name: 'Store', emoji: '🛒', relatedEmoji: '🍎', clues: ['You buy food here', 'You pay money here'] },
+            { id: 'restaurant', name: 'Restaurant', emoji: '🍽️', relatedEmoji: '👨‍🍳', clues: ['Chefs cook here', 'Waiters serve food'] },
+            { id: 'library', name: 'Library', emoji: '📚', relatedEmoji: '📖', clues: ['You read books here', 'Please be quiet here'] },
+            { id: 'stadium', name: 'Stadium', emoji: '⚽', relatedEmoji: '🏆', clues: ['Athletes play here', 'People cheer here'] },
+            { id: 'airport', name: 'Airport', emoji: '✈️', relatedEmoji: '🧳', clues: ['Planes fly here', 'Pilots work here'] },
+            { id: 'beach', name: 'Beach', emoji: '🏖️', relatedEmoji: '👙', clues: ['You swim in the sea', 'You build sandcastles'] }
+        ];
+        let currentPlaceTarget = null, placeLocked = false;
+
+        function openPlacesGame() { showView('placesView'); startPlacesRound(); }
+
+        function startPlacesRound() {
+            placeLocked = false;
+            const board = document.getElementById('placesOptionsBoard'); board.innerHTML = '';
+            const randomTargetIdx = Math.floor(Math.random() * placesDB.length);
+            currentPlaceTarget = placesDB[randomTargetIdx];
+            const randomClue = currentPlaceTarget.clues[Math.floor(Math.random() * currentPlaceTarget.clues.length)];
+            
+            document.getElementById('clueText').innerText = randomClue;
+            document.getElementById('clueIcon').innerText = currentPlaceTarget.relatedEmoji; 
+            speakText(randomClue);
+
+            let options = [currentPlaceTarget];
+            const distractors = placesDB.filter(p => p.id !== currentPlaceTarget.id);
+            distractors.sort(() => Math.random() - 0.5);
+            options.push(distractors[0], distractors[1], distractors[2]);
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(place => {
+                const card = document.createElement('div');
+                card.className = 'place-option';
+                card.innerHTML = `<span class="place-option-emoji">${place.emoji}</span><span class="place-option-name">${place.name}</span>`;
+                card.onclick = () => handlePlaceClick(place, card);
+                board.appendChild(card);
+            });
+        }
+        function handlePlaceClick(place, card) {
+            if (placeLocked) return;
+            if (place.id === currentPlaceTarget.id) {
+                placeLocked = true; card.classList.add('correct');
+                playGameSound('success'); speakText(`Yes! ${place.name}!`);
+                setTimeout(startPlacesRound, 2000);
+            } else {
+                card.classList.add('wrong'); playGameSound('error'); speakText("Try again");
+                setTimeout(() => card.classList.remove('wrong'), 500);
+            }
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 4: FAMILY
+           ----------------------------------------------------- */
+        const familyMembers = [ { name: "Mother", emoji: "👩" }, { name: "Father", emoji: "👨" }, { name: "Sister", emoji: "👧" }, { name: "Brother", emoji: "👦" }, { name: "Grandma", emoji: "👵" }, { name: "Grandpa", emoji: "👴" } ];
+        let currentRoundMembers = [], missingMember = null;
+
+        function openFamilyGame() { showView('familyView'); startFamilyGame(); }
+
+        function startFamilyGame() {
+            const board = document.getElementById("familyBoard");
+            const options = document.getElementById("familyOptions");
+            const question = document.getElementById("familyQuestion");
+            const timerDisplay = document.getElementById("familyTimerDisplay");
+
+            board.innerHTML = ""; options.innerHTML = "";
+            question.innerText = "Look carefully 👀";
+            timerDisplay.style.visibility = "visible";
+
+            currentRoundMembers = [...familyMembers].sort(() => Math.random() - 0.5).slice(0, 5);
+            currentRoundMembers.forEach(m => {
+                const card = document.createElement("div"); card.className = "family-card";
+                card.innerHTML = `<div class="emoji">${m.emoji}</div><div>${m.name}</div>`;
+                board.appendChild(card);
+            });
+
+            speakText("Look carefully");
+            let timeLeft = 7;
+            timerDisplay.innerText = "⏳ " + timeLeft;
+            clearInterval(observationTimerInterval);
+            
+            observationTimerInterval = setInterval(() => {
+                timeLeft--; timerDisplay.innerText = "⏳ " + timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(observationTimerInterval);
+                    timerDisplay.style.visibility = "hidden";
+                    hideOneMember();
+                }
+            }, 1000);
+        }
+
+        function hideOneMember() {
+            const board = document.getElementById("familyBoard");
+            const question = document.getElementById("familyQuestion");
+            missingMember = currentRoundMembers[Math.floor(Math.random() * currentRoundMembers.length)];
+            board.innerHTML = "";
+            currentRoundMembers.filter(m => m.name !== missingMember.name).forEach(m => {
+                const card = document.createElement("div"); card.className = "family-card faded";
+                card.innerHTML = `<div class="emoji">${m.emoji}</div>`;
+                board.appendChild(card);
+            });
+            question.innerText = "Who is missing?"; speakText("Who is missing");
+            showFamilyOptions();
+        }
+
+        function showFamilyOptions() {
+            const options = document.getElementById("familyOptions");
+            let choices = [...familyMembers].sort(() => Math.random() - 0.5).slice(0, 3);
+            if (!choices.find(c => c.name === missingMember.name)) { choices[0] = missingMember; }
+            choices.sort(() => Math.random() - 0.5);
+            choices.forEach(choice => {
+                const btn = document.createElement("button"); btn.className = "family-option";
+                btn.innerText = `${choice.emoji} ${choice.name}`;
+                btn.onclick = () => checkFamilyAnswer(choice); options.appendChild(btn);
+            });
+        }
+
+        function checkFamilyAnswer(selected) {
+            const question = document.getElementById("familyQuestion");
+            if (selected.name === missingMember.name) {
+                question.innerText = "Correct! ⭐"; question.style.color = "#48bb78";
+                playGameSound('success'); speakText(`Yes! ${selected.name}`);
+                setTimeout(() => { question.style.color = "#4a5568"; startFamilyGame(); }, 2000);
+            } else { playGameSound('error'); speakText("Try again"); }
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 5: FOOD
+           ----------------------------------------------------- */
+        const foodData = [ { name: "Pizza", emoji: "🍕", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=200&q=80" }, { name: "Apple", emoji: "🍎", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=200&q=80" }, { name: "Sandwich", emoji: "🥪", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=200&q=80" }, { name: "Milk", emoji: "🥛", img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=200&q=80" }, { name: "Water", emoji: "💧", img: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=200&q=80" }, { name: "Ice Cream", emoji: "🍦", img: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?auto=format&fit=crop&w=200&q=80" }, { name: "Bread", emoji: "🍞", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=200&q=80" }, { name: "Rice", emoji: "🍚", img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=200&q=80" } ];
+        let foodSelection = { subject: null, verb: null, food: null }, foodScore = 0;
+
+        function openFoodGame() { showView('foodView'); renderFoodGrid(); }
+        function renderFoodGrid() {
+            const grid = document.getElementById('foodGrid'); grid.innerHTML = '';
+            foodData.forEach(item => {
+                const card = document.createElement('div'); card.className = 'food-card';
+                card.innerHTML = `<img src="${item.img}" alt="${item.name}"><div>${item.name}</div>`;
+                card.onclick = () => selectFoodItem('food', item.name, card); grid.appendChild(card);
+            });
+        }
+        function selectFoodItem(type, value, element) {
+            speakText(value); foodSelection[type] = value;
+            let parent = (type === 'food') ? document.getElementById('foodGrid') : element.parentElement;
+            Array.from(parent.children).forEach(c => c.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+        function checkFoodSentence() {
+            const { subject, verb, food } = foodSelection;
+            if (!subject || !verb || !food) { speakText("Please select all cards."); return; }
+            let isCorrect = (subject === 'I' && verb === 'like') || ((subject === 'He' || subject === 'She') && verb === 'likes');
+            if (isCorrect) {
+                playGameSound('success'); foodScore++; document.getElementById('foodScore').innerText = foodScore;
+                speakText(`Correct! ${subject} ${verb} ${food}.`);
+                const btn = document.querySelector('.food-check-btn');
+                btn.style.transform = "scale(1.1)"; btn.style.background = "gold";
+                setTimeout(() => { btn.style.transform = "scale(1)"; btn.style.background = ""; resetFoodGame(); }, 2000);
+            } else { playGameSound('error'); speakText("Try again. Check the grammar."); }
+        }
+        function resetFoodGame() {
+            foodSelection = { subject: null, verb: null, food: null };
+            document.querySelectorAll('.selection-card, .food-card').forEach(el => el.classList.remove('selected'));
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 6: BODY PARTS
+           ----------------------------------------------------- */
+        const bodyPartsDB = [ { id: 'head', name: 'Head', emoji: '🙆‍♂️' }, { id: 'shoulders', name: 'Shoulders', emoji: '🤷‍♂️' }, { id: 'knees', name: 'Knees', emoji: '🦵' }, { id: 'toes', name: 'Toes', emoji: '🦶' }, { id: 'eyes', name: 'Eyes', emoji: '👀' }, { id: 'ears', name: 'Ears', emoji: '👂' }, { id: 'mouth', name: 'Mouth', emoji: '👄' }, { id: 'nose', name: 'Nose', emoji: '👃' }, { id: 'hands', name: 'Hands', emoji: '👐' }, { id: 'feet', name: 'Feet', emoji: '👣' } ];
+        let currentBodyTarget = null, bodyScore = 0, isBodyGameActive = false;
+
+        function openBodyGame() {
+            showView('bodyView'); document.getElementById('bodyScore').innerText = '0';
+            document.getElementById('bodyInstructionText').innerText = "Ready to move?";
+            document.getElementById('bodyBoard').innerHTML = '<button class="start-btn-large" onclick="startBodyRound()">▶️ START GAME</button>';
+            document.getElementById('bodyTimerBar').style.width = "100%";
+        }
+
+        function startBodyRound() {
+            isBodyGameActive = true;
+            const board = document.getElementById('bodyBoard');
+            const instructionText = document.getElementById('bodyInstructionText');
+            const timerBar = document.getElementById('bodyTimerBar');
+            
+            board.innerHTML = '';
+            const randomIdx = Math.floor(Math.random() * bodyPartsDB.length);
+            currentBodyTarget = bodyPartsDB[randomIdx];
+
+            // FASE 1: "TOUCH THE..."
+            instructionText.innerText = `TOUCH THE ${currentBodyTarget.name.toUpperCase()}!`;
+            instructionText.style.color = "#2d3748";
+            speakText(`Touch the ${currentBodyTarget.name}!`);
+
+            let options = [currentBodyTarget];
+            const distractors = bodyPartsDB.filter(p => p.id !== currentBodyTarget.id);
+            distractors.sort(() => Math.random() - 0.5);
+            options.push(distractors[0], distractors[1]);
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(part => {
+                const card = document.createElement('div'); card.className = 'body-card';
+                card.innerHTML = `<div class="body-card-icon">${part.emoji}</div><div class="body-card-text">${part.name}</div>`;
+                card.onclick = () => checkBodyAnswer(part, card);
+                board.appendChild(card);
+            });
+
+            timerBar.style.transition = 'none'; timerBar.style.width = '100%';
+            void timerBar.offsetWidth; timerBar.style.transition = 'width 5s linear'; timerBar.style.width = '0%';
+            clearTimeout(bodyTimer);
+            bodyTimer = setTimeout(() => { if(isBodyGameActive) handleBodyTimeOut(); }, 5000);
+        }
+
+        function checkBodyAnswer(selected, cardElement) {
+            if (!isBodyGameActive) return;
+            clearTimeout(bodyTimer);
+            if (selected.id === currentBodyTarget.id) {
+                isBodyGameActive = false; cardElement.classList.add('correct');
+                playGameSound('success'); setTimeout(() => startPhysicalActionPhase(selected), 1000);
+            } else {
+                cardElement.classList.add('wrong'); playGameSound('error'); speakText("Try again!");
+                setTimeout(() => cardElement.classList.remove('wrong'), 500);
+            }
+        }
+
+        // FASE 2: "TOUCH YOUR..."
+        function startPhysicalActionPhase(target) {
+            const board = document.getElementById('bodyBoard');
+            const instructionText = document.getElementById('bodyInstructionText');
+            
+            instructionText.innerText = `NOW, TOUCH YOUR ${target.name.toUpperCase()}!`;
+            instructionText.style.color = "#e53e3e";
+            board.innerHTML = `<div id="actionCountDown" style="font-size: 100px; font-weight: 900; color: #319795; animation: popIn 0.5s;">5</div>`;
+            
+            speakText(`Now, touch your ${target.name} in real life!`);
+
+            let countdown = 5;
+            globalActionInterval = setInterval(() => {
+                countdown--;
+                if(countdown > 0) { document.getElementById('actionCountDown').innerText = countdown; }
+                else {
+                    clearInterval(globalActionInterval);
+                    playGameSound('success'); speakText("Great Job!");
+                    bodyScore++; document.getElementById('bodyScore').innerText = bodyScore;
+                    startBodyRound();
+                }
+            }, 1000);
+        }
+
+        function handleBodyTimeOut() {
+            isBodyGameActive = false; playGameSound('error');
+            document.getElementById('bodyInstructionText').innerText = "TIME'S UP! ⏰";
+            speakText(`Time is up! Show me the ${currentBodyTarget.name}`);
+            setTimeout(startBodyRound, 3000);
+        }
+
+        /* -----------------------------------------------------
+           JUEGO 7: ACTIONS (LET'S MOVE)
+           ----------------------------------------------------- */
+        const actionsDB = [ { text: "Jump!", emoji: "🦘" }, { text: "Run!", emoji: "🏃" }, { text: "Clap!", emoji: "👏" }, { text: "Spin!", emoji: "🌪️" }, { text: "Dance!", emoji: "💃" }, { text: "Stomp!", emoji: "🐘" }, { text: "Sleep!", emoji: "😴" }, { text: "Eat!", emoji: "🍽️" } ];
+
+        function openActionsGame() {
+            showView('actionsView');
+            document.getElementById('actionEmoji').innerText = "🏃‍♂️";
+            document.getElementById('actionText').innerText = "Ready?";
+            document.getElementById('actionTimerDisplay').innerText = "5";
+            document.getElementById('startActionBtn').style.display = "inline-block";
+            playMusic(); // SOLO AQUÍ SUENA LA MÚSICA
+        }
+
+        function startActionRound() {
+            document.getElementById('startActionBtn').style.display = "none";
+            const randomAction = actionsDB[Math.floor(Math.random() * actionsDB.length)];
+            
+            document.getElementById('actionEmoji').innerText = randomAction.emoji;
+            document.getElementById('actionText').innerText = randomAction.text;
+            
+            playGameSound('whistle');
+            speakText(randomAction.text);
+
+            let timeLeft = 5;
+            document.getElementById('actionTimerDisplay').innerText = timeLeft;
+            
+            globalActionInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('actionTimerDisplay').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(globalActionInterval);
+                    finishActionRound();
+                }
+            }, 1000);
+        }
+
+        function finishActionRound() {
+            playGameSound('success'); speakText("Great moving!");
+            document.getElementById('actionText').innerText = "GREAT! 🎉";
+            actionTimerRef = setTimeout(() => { startActionRound(); }, 2000);
+        }
+
+    </script>
+</body>
+</html>
